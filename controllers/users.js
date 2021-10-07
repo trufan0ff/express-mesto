@@ -14,8 +14,8 @@ module.exports.getCurrentUsers = (req, res) => {
 
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body; // получим из объекта запроса имя и описание пользователя
-  User.create({ name, about, avatar }); // создадим документ на основе пришедших данных
-  .catch ((arr) => res.status(500).send({ message: 'Произошла ошибка' }));
+  User.create({ name, about, avatar }) // создадим документ на основе пришедших данных
+  .catch ((arr) => res.status(500).send({ message: 'Произошла ошибка' }))
 }
 
 module.exports.updateProfile = (req, res) => {

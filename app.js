@@ -1,19 +1,17 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser')
+const users = require('./routes/users');
+const cards = require('./routes/cards');
 
 const { PORT = 3000 } = process.env;
-
-
-const app = express();
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: true}))
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
   useCreateIndex: true,
     useFindAndModify: false
 });
+
+const app = express();
 
 app.use((req, res, next) => {
   req.user = {
@@ -26,6 +24,9 @@ module.exports.createCard = (req, res) => {
   console.log(req.user._id); // _id станет доступен
 };
 
+app.use('/users', users);
+
+app.use('/cards', cards);
 
 app.listen(PORT, () => {
     // Если всё работает, консоль покажет, какой порт приложение слушает
