@@ -1,9 +1,10 @@
 {
   "author": "Труфанов Виктор",
   "description": "Back-end проекта mesto",
-  "name": "mesto-react",
-  "homepage": "https://trufan0ff.github.io/react-mesto-auth",
-  "version": "0.1.0",
+  "main": "app.js",
+  "name": "express-mesto",
+  "homepage": "https://trufan0ff.github.io/express-mesto",
+  "version": "0.1.1",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.14.1",
