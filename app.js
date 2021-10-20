@@ -2,9 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const users = require('./routes/users');
 const cards = require('./routes/cards');
-const usersControl = require('./controllers/users');
+const { usersLogin, createUser } = require('./controllers/users');
 const bodyParser = require('body-parser');
-const { celebrate, Joi } = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate');
 const validator = require('validator');
 const auth = require('./middlewares/auth');
 const error = require('./middlewares/error');
@@ -29,7 +29,6 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(auth);
 
 app.use((req, res, next) => {
   const { origin } = req.headers;
@@ -50,30 +49,29 @@ app.use((req, res, next) => {
 
   next();
 });
-
-app.post('/signin', celebrate({
-    body: Joi.object().keys({
-    email: Joi.string().required().min(2).max(30),
-    password: Joi.string().required().min(2),
-  }),
-}), usersControl.usersLogin);
-
 app.post('/signup', celebrate({
-    body: Joi.object().keys({
+  body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
     avatar: Joi.string().custom(validateURL),
-    email: Joi.string().required().min(2).max(30),
+    email: Joi.string().email({tlds:{allow: false}}).required(),
     password: Joi.string().required().min(2),
   }),
-}), usersControl.createUser);
+}), createUser);
+
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().email({tlds:{allow: false}}).required(),
+    password: Joi.string().required().min(2).max(30),
+  }),
+}), usersLogin);
 
 app.use(auth);
 app.use('/users', users);
 app.use('/cards', cards);
-app.use('/*', (req, res) => {
-  throw new NotFoundError('Cтраница не найдена');
-});
+// app.use('/*', (req, res) => {
+//   throw new NotFoundError('Cтраница не найдена');
+// });
 app.use(errors());
 app.use(error);
 

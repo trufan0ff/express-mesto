@@ -77,8 +77,8 @@ module.exports.updateAvatar = (req, res, next) => {
   )
   .then((user) => cathIdError(res, user))
   .catch(next);
-
-  module.exports.usersLogin = function (req, res, next) {
+}
+  module.exports.usersLogin =  (req, res, next) => {
     const { email, password } = req.body;
     let findedUser;
     User.findOne({ email }).select('+password')
@@ -86,7 +86,6 @@ module.exports.updateAvatar = (req, res, next) => {
         if (!user) {
           throw new LoginPasswordError('Неправильные почта или пароль');
         }
-
         findedUser = user;
         return bcrypt.compare(password, user.password);
       })
@@ -94,7 +93,6 @@ module.exports.updateAvatar = (req, res, next) => {
         if (!matched) {
           throw new LoginPasswordError('Неправильные почта или пароль');
         }
-
         // создадим токен
         const token = jwt.sign({ _id: findedUser._id },
           NODE_ENV === 'production' ? JWT_SECRET : 'secret-key', { expiresIn: '7d' });
@@ -104,4 +102,3 @@ module.exports.updateAvatar = (req, res, next) => {
       })
       .catch(next);
   };
-}
