@@ -2,45 +2,79 @@ const express = require('express');
 const mongoose = require('mongoose');
 const users = require('./routes/users');
 const cards = require('./routes/cards');
+const usersControl = require('./controllers/users');
 const bodyParser = require('body-parser');
+const { celebrate, Joi } = require('celebrate');
+const validator = require('validator');
+const auth = require('./middlewares/auth');
+const error = require('./middlewares/error');
+const NotFoundError = require('./errors/not-found-err');
+
+const validateURL = (value) => {
+  if (!validator.isURL(value, { require_protocol: true })) {
+    throw new Error('Неправильный формат ссылки');
+  }
+  return value;
+};
 
 const { PORT = 3000 } = process.env;
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
   useCreateIndex: true,
-    useFindAndModify: false
+  useFindAndModify: false
 });
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(auth);
 
 app.use((req, res, next) => {
-  req.user = {
-    _id: '61561cb73bda543d7576f342' // вставьте сюда _id созданного в предыдущем пункте пользователя
-  };
+  const { origin } = req.headers;
+  const { method } = req;
+  const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
+  const requestHeaders = req.headers['access-control-request-headers'];
+  res.header('Access-Control-Allow-Credentials', true);
+  if (allowedCors.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  if (method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
+  }
+  if (method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Headers', requestHeaders);
+    return res.end();
+  }
 
   next();
 });
 
+app.post('/signin', celebrate({
+    body: Joi.object().keys({
+    email: Joi.string().required().min(2).max(30),
+    password: Joi.string().required().min(2),
+  }),
+}), usersControl.usersLogin);
 
+app.post('/signup', celebrate({
+    body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().custom(validateURL),
+    email: Joi.string().required().min(2).max(30),
+    password: Joi.string().required().min(2),
+  }),
+}), usersControl.createUser);
+
+app.use(auth);
 app.use('/users', users);
-
 app.use('/cards', cards);
+app.use('/*', (req, res) => {
+  throw new NotFoundError('Cтраница не найдена');
+});
+app.use(errors());
+app.use(error);
 
-async function start() {
-  try {
-    await mongoose.connect('mongodb://localhost:27017/mestodb', {
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useFindAndModify: false
-    });
-    app.listen(PORT, () => console.log(`App listining on port: >>> ${PORT} <<<`));
-  } catch (e) {
-    console.log('Server ERROR: >>>', e.message);
-    process.exit(1);
-  }
-}
-start();
+app.listen(PORT, () => console.log(`App listining on port: ${PORT}`));

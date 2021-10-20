@@ -6,11 +6,15 @@
   "homepage": "https://trufan0ff.github.io/express-mesto",
   "version": "0.1.2",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
+    "celebrate": "^15.0.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.24.2",
     "express": "^4.17.1",
-    "mongoose": "^6.0.7"
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.0.11",
+    "validator": "^13.6.0"
   },
   "scripts": {
     "start": "node app.js",

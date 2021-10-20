@@ -9,16 +9,14 @@ const cardSchema = new mongoose.Schema({
   },
   link: {
     type: String, //
-    required: true, // оно должно быть у каждого пользователя, так что имя — обязательное поле
+    required: true,
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true, // оно должно быть у каждого пользователя, так что имя — обязательное поле
+    required: true,
   },
   likes: [{
-    type: [{
-      type: mongoose.Schema.Types.ObjectId,
-    }],
+    type:  mongoose.Schema.Types.ObjectId,
     default: [],
   }],
   createdAt: {
