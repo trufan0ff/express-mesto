@@ -11,7 +11,7 @@ const cathIdError = function (res, card) {
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
-  .then(card => res.status(200).send({ data: card }))
+  .then(card => res.status(200).send({ card }))
   .catch(next);
 }
 
@@ -28,13 +28,12 @@ module.exports.deleteCard = (req, res, next) => Card.findByIdAndRemove(req.param
   if (!card) {
     throw new NotFoundError('Данные не найдены');
   }
-
-  if (req.user._id != card.owner._id) {
+  if (req.user._id !== card.owner._id) {
     throw new Forbidden('Доступ запрещён');
   }
   return Card.findByIdAndRemove(req.params.cardId);
 })
-.then((card) => cathIdError(res, card))
+.then(res.status(200).send({ message: 'Удалено' }))
 .catch(next);
 
 module.exports.likeCard = (req, res, next) =>  Card.findByIdAndUpdate(

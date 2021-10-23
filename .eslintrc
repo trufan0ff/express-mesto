@@ -1,6 +1,6 @@
 {
   "extends": "airbnb-base",
-  "enforceInMethodNames": true,
+  // "enforceInMethodNames": true,
   "allow": ["_id"],
   "allowAfterThis": true,
   "allowAfterSuper": true,

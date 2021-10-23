@@ -12,7 +12,7 @@ const validateURL = (value) => {
   return value
 }
 
-router.post('/cards', celebrate({
+router.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
     link: Joi.string().required().custom(validateURL),
@@ -20,21 +20,21 @@ router.post('/cards', celebrate({
 }), cards.createCard);
 
 
-router.delete('/cards/:cardId', celebrate({
+router.delete('/:cardId', celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().length(24).hex(),
   }),
 }), cards.deleteCard);
 
-router.get('/cards', cards.getCards)
+router.get('/', cards.getCards)
 
-router.put('/cards/:cardId/likes', celebrate({
+router.put('/:cardId/likes', celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().length(24).hex(),
   }),
 }), cards.likeCard)
 
-router.delete('/cards/:cardId/likes', celebrate({
+router.delete('/:cardId/likes', celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().length(24).hex(),
   }),

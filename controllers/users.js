@@ -13,12 +13,12 @@ const cathIdError = function (res, user) {
   if (!user) {
     throw new NotFoundError('Данные не найдены');
   }
-  return res.send({ data: user });
+  return res.status(200).send({ data: user });
 };
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then(user => res.status(200).send({ data: user }))
+    .then((user) => cathIdError(res, user))
     .catch(next);
 }
 
@@ -57,13 +57,9 @@ module.exports.createUser = (req, res, next) => {
 }
 
 module.exports.updateProfile = (req, res, next) => {
-  User.findByIdAndUpdate(req.user._id, { name, about }),
-    {
-      new: true,
-      runValidators: true,
-    }
+  User.findByIdAndUpdate(req.user._id, { name:req.body.name, about:req.body.about }, { new: true, runValidators: true },)
     .then((user) => cathIdError(res, user))
-    .catch(next);
+    .catch(next)
 }
 
 module.exports.updateAvatar = (req, res, next) => {
@@ -78,7 +74,7 @@ module.exports.updateAvatar = (req, res, next) => {
   .then((user) => cathIdError(res, user))
   .catch(next);
 }
-  module.exports.usersLogin =  (req, res, next) => {
+  module.exports.usersLogin = (req, res, next) => {
     const { email, password } = req.body;
     let findedUser;
     User.findOne({ email }).select('+password')
@@ -94,8 +90,7 @@ module.exports.updateAvatar = (req, res, next) => {
           throw new LoginPasswordError('Неправильные почта или пароль');
         }
         // создадим токен
-        const token = jwt.sign({ _id: findedUser._id },
-          NODE_ENV === 'production' ? JWT_SECRET : 'secret-key', { expiresIn: '7d' });
+        const token = jwt.sign({ _id: findedUser._id }, JWT_SECRET , { expiresIn: '7d' });
 
         // вернём токен
         res.send({ token });

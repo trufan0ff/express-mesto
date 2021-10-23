@@ -11,24 +11,27 @@ const validateURL = (value) => {
   return value;
 };
 
-router.get('/users', users.getUsers);
+router.get('/', users.getUsers);
+
+router.post('/', users.createUser);
 
 router.get('/me', users.getUserMe);
 
-router.get('/users/:userId', celebrate({
+
+router.get('/:id', celebrate({
   params: Joi.object().keys({
     id: Joi.string().length(24).hex(),
   }),
 }), users.getCurrentUsers);
 
-router.patch('/users/me', celebrate({
+router.patch('/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
     about: Joi.string().required().min(2).max(30),
   }),
 }), users.updateProfile);
 
-router.patch('/users/me/avatar', celebrate({
+router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().required().custom(validateURL),
   }),
