@@ -90,7 +90,7 @@ module.exports.updateAvatar = (req, res, next) => {
           throw new LoginPasswordError('Неправильные почта или пароль');
         }
         // создадим токен
-        const token = jwt.sign({ _id: findedUser._id }, JWT_SECRET , { expiresIn: '7d' });
+        const token = jwt.sign({ _id: findedUser._id }, NODE_ENV === 'production' ? JWT_SECRET : 'secret-key' , { expiresIn: '7d' });
 
         // вернём токен
         res.send({ token });

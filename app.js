@@ -8,6 +8,7 @@ const { celebrate, Joi, errors } = require('celebrate');
 const validator = require('validator');
 const auth = require('./middlewares/auth');
 const error = require('./middlewares/error');
+const NotFoundError = require('./errors/not-found-err');
 
 const validateURL = (value) => {
   if (!validator.isURL(value, { require_protocol: true })) {
@@ -64,9 +65,12 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
+
+
 app.use(auth);
 app.use('/users', users);
 app.use('/cards', cards);
+app.use('/', (req, res, next) => next(new NotFoundError('Ресурс не найден')));
 app.use(errors());
 app.use(error);
 
