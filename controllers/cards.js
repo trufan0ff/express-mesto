@@ -23,17 +23,17 @@ module.exports.createCard = (req, res, next) => {
     .catch(next);
 }
 
-module.exports.deleteCard = (req, res, next) => Card.findByIdAndRemove(req.params.id)
+module.exports.deleteCard = (req, res, next) => Card.findById(req.params.cardId)
 .then((card) => {
   if (!card) {
     throw new NotFoundError('Данные не найдены');
   }
-  if (req.user._id !== card.owner._id) {
+  if (req.user._id !== card.owner.toString()) {
     throw new Forbidden('Доступ запрещён');
   }
-  return Card.findByIdAndRemove(req.params.cardId);
+  Card.findByIdAndRemove(req.params.cardId)
+  .then(res.status(200).send({ message: 'Удалено' }))
 })
-.then(res.status(200).send({ message: 'Удалено' }))
 .catch(next);
 
 module.exports.likeCard = (req, res, next) =>  Card.findByIdAndUpdate(
